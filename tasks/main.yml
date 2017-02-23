@@ -1,0 +1,30 @@
+---
+- name: Install packages (CentOS)                                
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ zabbix_cloudwatch_centos_packages }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Create zabbix dir
+  file:
+    path: "{{ zabbix_cloudwatch_path }}"
+    state: directory
+    mode: 0755
+
+- name: Clone zabbix cloudwatch repo
+  git:
+    repo: "{{ zabbix_cloudwatch_git_repo }}"
+    dest: "{{ zabbix_cloudwatch_path_clone }}"
+    version: "{{ zabbix_cloudwatch_git_ref }}"
+    depth: 1
+    force: yes
+
+- name: Redshift cron jobs
+  cron:
+    name: "{{ item.title | default(item.cluster_identifier)}}"
+    state: "{{ item.state | default('present') }}"
+    user: "{{ item.user | default('root') }}"
+    minute: "{{ item.interval | default('*/5') }}"
+    job: "{{zabbix_cloudwatch_path}}/cron.d/cron.RedShift.sh \"{{ item.cluster_identifier }}\" \"{{ item.zabbix_host }}\" \"{{ item.zabbix_server | default('localhost') }}\" \"{{ item.aws_account }}\" \"{{ item.aws_region }}\" &>/dev/null"
+  with_items: "{{ zabbix_cloudwatch_redshift }}"

@@ -1,0 +1,11 @@
+---
+zabbix_cloudwatch_centos_packages:
+  - python
+  - python2-boto
+
+zabbix_cloudwatch_git_repo: "https://github.com/omni-lchen/zabbix-cloudwatch.git"
+zabbix_cloudwatch_path: "/opt/zabbix"
+zabbix_cloudwatch_path_clone:  "{{ zabbix_cloudwatch_path }}/cloudwatch"
+zabbix_cloudwatch_git_ref: "HEAD"
+
+zabbix_cloudwatch_redshift: []
